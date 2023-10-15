@@ -1,0 +1,25 @@
+[package]
+name = "paystack"
+version = "0.1.0"
+edition = "2021"
+categories = ["game-engines", "graphics", "gui", "rendering"]
+description = "A refreshingly simple data-driven game engine and app framework"
+keywords = ["paystack", "fintech", "open-source"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+# authors = ""
+# repository = ""
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+dotenv = "0.15.0"
+secrecy = { version = "0.8", features = ["serde"] }
+serde = { version = "1.0.116", features = ["derive"] }
+serde_json = "1.0.58"
+thiserror = "1"
+
+[dependencies.reqwest]
+version = "0.11"
+default-features = false
+features = ["json", "rustls-tls", "cookies"]
