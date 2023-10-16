@@ -1,7 +1,7 @@
 use std::env;
 
 use dotenv::dotenv;
-use secrecy::Secret;
+use secrecy::{ExposeSecret, Secret};
 
 use crate::AuthError;
 
@@ -13,4 +13,8 @@ pub fn cred_from_env(env_key: String) -> Result<Secret<String>, AuthError> {
         .unwrap();
 
     Ok(Secret::new(pk))
+}
+
+pub fn expose_secret(secret: Secret<String>) -> String {
+    secret.expose_secret().to_owned()
 }
