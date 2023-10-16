@@ -103,7 +103,7 @@ impl PaymentBuilder {
     }
 }
 
-struct InitialisePay(PaymentBuilder);
+pub struct InitialisePay(PaymentBuilder);
 
 impl InitialisePay {
     /// Send Transaction
@@ -130,7 +130,7 @@ impl InitialisePay {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-enum Currency {
+pub enum Currency {
     NGN,
     USD,
     GHS,
@@ -139,7 +139,7 @@ enum Currency {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-enum Channel {
+pub enum Channel {
     Card,
     Bank,
     USSD,
@@ -149,7 +149,7 @@ enum Channel {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct MobileMoneyInfo {
+pub struct MobileMoneyInfo {
     phone: u32,
     provider: String,
 }
