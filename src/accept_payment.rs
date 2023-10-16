@@ -1,12 +1,13 @@
 use std::time;
 
 use reqwest::Client;
+use secrecy::Secret;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::ResponseError;
+use crate::{ResponseError, expose_secret};
 
-// Ref: https://paystack.com/docs/payments/accept-payments/
+/// Building blocks for initiating a Paystack Payment
 #[derive(Debug, Deserialize, Serialize)]
 pub struct PaymentBuilder {
     // Required Data
@@ -23,11 +24,14 @@ pub struct PaymentBuilder {
 }
 
 impl PaymentBuilder {
-    pub fn init_payment(email: String, amount: f64, key: String) -> Self {
+    /// Initiate your `PaymentBuilder` taking in the basic requirements as args.
+    /// 
+    /// key can be derived using the `cred_from_env`
+    pub fn init_payment(email: String, amount: f64, key: Secret<String>) -> Self {
         Self {
             amount,
             email,
-            key,
+            key: expose_secret(key),
             channel: None,
             currency: None,
             label: None,
@@ -35,10 +39,10 @@ impl PaymentBuilder {
             reference: None,
         }
     }
-
-    /// Build your `PaymentBuilder` object to be used to by `InitialisePay` to initiate Paystack payment
-    pub fn build(self) -> InitialisePay {
-        InitialisePay(self)
+    
+    /// create your `Payment` to initiate Paystack payment
+    pub fn build(self) -> Payment {
+        Payment(self)
     }
 
     /// Amount in the subunit of the supported currency you are debiting customer. Do not pass this if creating subscriptions.
@@ -103,9 +107,28 @@ impl PaymentBuilder {
     }
 }
 
-pub struct InitialisePay(PaymentBuilder);
+/// Data wrapper for payment ready to send for initialization
+pub struct Payment(pub PaymentBuilder);
 
-impl InitialisePay {
+impl Payment {
+    /// Build your `PaymentBuilder` object to be used to by `Payment` to initiate Paystack payment
+    pub fn builder(
+        email: String, 
+        amount: f64, 
+        key: Secret<String>
+    ) -> PaymentBuilder {
+        PaymentBuilder {
+            amount,
+            email,
+            key: expose_secret(key),
+            channel: None,
+            currency: None,
+            label: None,
+            metadata: None,
+            reference: None,
+        }
+    }
+
     /// Send Transaction
     pub async fn send(&self) -> Result<(), ResponseError> {
         let timeout = time::Duration::from_millis(10000);
@@ -129,6 +152,7 @@ impl InitialisePay {
     }
 }
 
+/// Supported Currencies
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Currency {
     NGN,
@@ -138,6 +162,7 @@ pub enum Currency {
     KES,
 }
 
+/// Available payment channels
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Channel {
     Card,
@@ -148,6 +173,7 @@ pub enum Channel {
     BankTransfer,
 }
 
+/// Mobile money object data
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MobileMoneyInfo {
     phone: u32,
@@ -155,15 +181,15 @@ pub struct MobileMoneyInfo {
 }
 
 mod test {
-    use serde_json::Value;
+    use crate::Payment;
 
-    use super::{Channel, PaymentBuilder};
+    use super::{PaymentBuilder, Channel};
 
-    fn init_Builder() -> PaymentBuilder {
-        let mut builder = PaymentBuilder::init_payment(
+    fn init_builder() -> PaymentBuilder {
+        let mut builder = Payment::builder(
             "test@example.com".to_string(),
             100.0,
-            "secret_key".to_string(),
+            "secret_key".to_string().into(),
         );
 
         builder.channel(Channel::Card);
@@ -175,7 +201,7 @@ mod test {
 
     #[test]
     fn json_response() {
-        let builder = init_Builder();
+        let builder = init_builder();
         let json_builder = builder.json_builder();
 
         let data = r#"{
@@ -187,7 +213,7 @@ mod test {
             "reference":"reference"
         }"#;
 
-        let json: Value = serde_json::from_str(data).unwrap();
+        let json: serde_json::Value = serde_json::from_str(data).unwrap();
 
         assert_eq!(json, json_builder)
     }
