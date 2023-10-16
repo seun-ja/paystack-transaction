@@ -1,5 +1,5 @@
 [package]
-name = "paystack"
+name = "paystack-transaction"
 version = "0.1.0"
 edition = "2021"
 description = "Paystack Rust Client"
@@ -7,7 +7,7 @@ keywords = ["paystack", "fintech", "open-source"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 # authors = ""
-# repository = ""
+repository = "https://github.com/seun-ja/paystack-transaction"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
