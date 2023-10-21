@@ -12,4 +12,6 @@ pub enum AuthError {
 pub enum ResponseError {
     #[error("Paystack Error: {0}")]
     PayStackError(String),
+    #[error("{0}; Couldn't verify transaction")]
+    TransactionVerificationError(bool),
 }

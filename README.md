@@ -15,7 +15,12 @@ async fn main() {
         key,
     );
 
-    builder.channel(Channel::Card);
+    builder.mobile_money(
+        MobileMoney {
+           phone: "08123456789".to_string(),
+           provider: "MTN".to_string(),
+        }
+    );
     builder.label("label".to_string());
     builder.reference("reference".to_string());
 
