@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::{
-    channels::{Bank, BankTransfer, Card, MobileMoney, QR, Ussd},
+    channels::{Bank, BankTransfer, Card, MobileMoney, Ussd, QR},
     expose_secret,
     verify::{VerificationData, Verify},
     ResponseError,
@@ -114,7 +114,7 @@ impl PaymentBuilder {
     }
 
     /// Set your bank data
-    pub fn bank(&mut self, bank: Bank)  {
+    pub fn bank(&mut self, bank: Bank) {
         self.bank = Some(bank)
     }
 
@@ -302,7 +302,7 @@ mod test {
         builder.label("label".to_string());
         builder.reference("reference".to_string());
         builder.currency(crate::Currency::NGN);
-        
+
         let json_builder = builder.json_builder();
 
         let data = r#"{
